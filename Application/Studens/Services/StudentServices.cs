@@ -121,7 +121,7 @@ namespace Application.Studens.Services
 
             usuario.UpdatedAt = DateTime.Now;
             usuario.Name = saveDto.User.Name;
-            usuario.Email = saveDto.User.Email;
+            usuario.Rol = "student";
 
             await _usuarioRepositorio.SaveAsync(usuario);
 

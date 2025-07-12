@@ -17,7 +17,7 @@ namespace Infraestructure.Repositories
 
         public async override Task<Student?> FindByIdAsync(Guid id)
         {
-            return await _dbContext.Set<Student>().Include(t => t.User).Include(t => t.StudentSubjects).ThenInclude(ss => ss.Subject).FirstOrDefaultAsync();
+            return await _dbContext.Set<Student>().Where(t => t.Id == id).Include(t => t.User).Include(t => t.StudentSubjects).ThenInclude(ss => ss.Subject).FirstOrDefaultAsync();
         }
 
         public override async Task<IReadOnlyList<Student>> FindAllAsync()
