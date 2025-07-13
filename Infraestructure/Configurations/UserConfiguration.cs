@@ -16,7 +16,7 @@ namespace Infraestructure.Configurations
             builder.Property(e => e.Email).HasColumnName("email");
             builder.Property(e => e.Password).HasColumnName("password");
             builder.Property(e => e.Name).HasColumnName("name");
-            builder.Property(e => e.Rol).HasColumnName("role");
+            builder.Property(e => e.Role).HasColumnName("role");
             builder.Property(e => e.CreateAt).HasColumnName("created_at");
             builder.Property(e => e.UpdatedAt).HasColumnName("updated_at");
 

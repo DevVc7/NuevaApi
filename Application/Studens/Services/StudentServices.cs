@@ -51,7 +51,7 @@ namespace Application.Studens.Services
 
             var user = _mapper.Map<User>(saveDto.User);
 
-            user.Rol = "student";
+            user.Role = "student";
             user.CreateAt = DateTime.Now;
             user.UpdatedAt = DateTime.Now;
             user.Password = _securityService.HashPassword(user.Email, user.Password);
@@ -121,7 +121,7 @@ namespace Application.Studens.Services
 
             usuario.UpdatedAt = DateTime.Now;
             usuario.Name = saveDto.User.Name;
-            usuario.Rol = "student";
+            usuario.Role = "student";
 
             await _usuarioRepositorio.SaveAsync(usuario);
 

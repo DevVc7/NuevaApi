@@ -106,9 +106,28 @@ namespace Application.Usuarios.Services
             return  _mapper.Map<UserDto>(response);
         }
 
-        public async Task<UserSecurityDto> LoginAsync(LoginRequest userAuthDto)
+        public async Task<LoginDto> LoginAsync(LoginRequest userAuthDto)
         {
-            User? user = await _usuarioRepositorio.FindByEmailAsync(userAuthDto.Username);
+
+            var response = await _usuarioRepositorio.FindAllAsync();
+
+            if(response.Count == 0)
+            {
+                User? us = new User()
+                {
+                    Email = userAuthDto.Email,
+                    Password = _securityService.HashPassword(userAuthDto.Email, userAuthDto.Password),
+                    Role = "admin",
+                    Name = "Admin",
+                    CreateAt = DateTime.Now,
+                    UpdatedAt = DateTime.Now
+                };
+
+                await _usuarioRepositorio.SaveAsync(us);
+            }
+
+
+            User? user = await _usuarioRepositorio.FindByEmailAsync(userAuthDto.Email);
             
 
             if (user is null) throw new NotFoundCoreException("Usuario no registrado");
@@ -122,18 +141,17 @@ namespace Application.Usuarios.Services
             var user_securiti = _securityService.JwtSecurity(jwtSecretKey);
 
             var responde_user = _mapper.Map<UserDto>(user);
+            
             byte[] randomBytes = RandomNumberGenerator.GetBytes(64);
             
-            var tokens = new Token() { AccessToken = user_securiti.Token , RefreshToken = Convert.ToBase64String(randomBytes) };
-            var login_response = new LoginDto() { User = responde_user, Tokens = tokens };
+            
 
 
-
-            UserSecurityDto userSecurity = new()
+            LoginDto userSecurity = new()
             {
-                Success = true,
-                Data = login_response,
-                Message = "Usuario autenticado con éxito"
+                AccessToken = user_securiti.Token,
+                RefreshToken = user_securiti.Token,
+                User = responde_user,
 
             };
 

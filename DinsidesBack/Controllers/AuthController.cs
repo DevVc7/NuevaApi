@@ -1,5 +1,6 @@
 ﻿using Application.Auth.Dto;
 using Application.Auth.Services.Interfaces;
+using Application.Usuarios.Dto;
 using Application.Usuarios.Services.Interface;
 using DinsidesBack.Exceptions;
 using Microsoft.AspNetCore.Authorization;
@@ -25,12 +26,12 @@ namespace DinsidesBack.Controllers
 
         [HttpPost("Login")]
         [AllowAnonymous]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserSecurityDto))]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(LoginDto))]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorValidationModel))]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorModel))]
-        public async Task<Results<BadRequest, Ok<UserSecurityDto>>> Post([FromBody] LoginRequest userAuthDto)
+        public async Task<Results<BadRequest, Ok<LoginDto>>> Post([FromBody] LoginRequest userAuthDto)
         {
-            UserSecurityDto userSecurity = await _userService.LoginAsync(userAuthDto);
+            LoginDto userSecurity = await _userService.LoginAsync(userAuthDto);
             return TypedResults.Ok(userSecurity);
         }
     }

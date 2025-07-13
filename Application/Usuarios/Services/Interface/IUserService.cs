@@ -7,6 +7,6 @@ namespace Application.Usuarios.Services.Interface
 {
     public interface IUserService : ICurdCoreService<UserDto, UserSaveDto, Guid>
     {
-        Task<UserSecurityDto> LoginAsync(LoginRequest userAuthDto);
+        Task<LoginDto> LoginAsync(LoginRequest userAuthDto);
     }
 }

@@ -9,15 +9,9 @@ namespace Application.Usuarios.Dto
 {
     public class LoginDto
     {
-        public UserDto? User { get; set; }
-        public Token? Tokens { get; set; }
-    }
-
-    public class Token
-    {
         public string? AccessToken { get; set; }
         public string? RefreshToken { get; set; }
-        
-
+        public UserDto? User { get; set; }
     }
+
 }
