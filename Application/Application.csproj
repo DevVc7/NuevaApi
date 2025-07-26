@@ -18,6 +18,10 @@
   <ItemGroup>
 	<ProjectReference Include="..\Domain\Domain.csproj" />
 	<ProjectReference Include="..\Infraestructure\Infraestructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Reports\Services\" />
   </ItemGroup>    
 
 </Project>

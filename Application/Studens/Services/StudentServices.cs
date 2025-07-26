@@ -1,18 +1,11 @@
 ﻿using Application.Auth.Services.Interfaces;
 using Application.Exceptions;
 using Application.Studens.Dtos.Students;
-using Application.Studens.Dtos.StudentSubje;
-using Application.Studens.Dtos.Subjec;
 using Application.Studens.Services.Interface;
 using Application.Usuarios.Dto;
 using AutoMapper;
 using Domain;
 using Infraestructure.Repositories.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Application.Studens.Services
 {

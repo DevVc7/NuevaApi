@@ -16,7 +16,7 @@ namespace Infraestructure.Repositories
 
         public async Task<Subjects> GetSubjectsName(string name)
         {
-            var response = await _dbContext.Set<Subjects>().Where( t => t.Name.Equals(name)).FirstOrDefaultAsync();
+            var response = await _dbContext.Set<Subjects>().Where( t => t.Name.ToLower().Trim().Contains(name.ToLower().Trim())).FirstOrDefaultAsync();
 
             return response;
         }
