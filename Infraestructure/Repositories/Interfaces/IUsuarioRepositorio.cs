@@ -3,7 +3,7 @@ using Infraestructure.Core.Repositories.Interfaces;
 
 namespace Infraestructure.Repositories.Interfaces
 {
-    public interface IUsuarioRepositorio : ICurdCoreRespository<User, Guid>
+    public interface IUsuarioRepositorio : ICurdCoreRespository<User, int>
     {
         Task<User?> FindByEmailAsync(string email);
         Task<User?> FindByPersonaAsync(string idPersona);

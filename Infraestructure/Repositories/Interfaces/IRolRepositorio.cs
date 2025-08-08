@@ -5,6 +5,6 @@ namespace Infraestructure.Repositories.Interfaces
 {
     public interface IRolRepositorio : ICurdCoreRespository<Rol, int>
     {
-        Task<PaginadoResponse<Rol>> BusquedaPaginado(PaginationRequest dto);
+        Task<Rol> FillName(string name);
     }
 }

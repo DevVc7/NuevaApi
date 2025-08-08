@@ -20,7 +20,7 @@ namespace DinsidesBack.Controllers
 
         [HttpPost]
         [AllowAnonymous]
-        public async Task<Results<BadRequest, Ok<OperationResult<UserDto>>>> Post([FromBody] UserSaveDto request)
+        public async Task<Results<BadRequest, Ok<OperationResult<UserDto>>>> Post([FromBody] UserRolSaveDto request)
         {
 
             var response = await _usuarioService.CreateAsync(request);

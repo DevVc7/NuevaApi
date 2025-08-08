@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infraestructure.Repositories
 {
-    public class UsuarioRepository : CurdCoreRespository<User, Guid>, IUsuarioRepositorio
+    public class UsuarioRepository : CurdCoreRespository<User, int>, IUsuarioRepositorio
     {
         private readonly ApplicationDbContext _context;
 
@@ -18,7 +18,7 @@ namespace Infraestructure.Repositories
         public async Task<User?> FindByEmailAsync(string email)
         {
             return await _context.Set<User>()
-                .Where(t => t.Email.ToUpper().Equals(email.ToUpper()))
+                .Where(t => t.Correo.ToUpper().Equals(email.ToUpper()))
                 .FirstOrDefaultAsync();
         }
 
@@ -30,10 +30,10 @@ namespace Infraestructure.Repositories
                 .FirstOrDefaultAsync();
         }
 
-        public async override Task<User?> FindByIdAsync(Guid id)
+        public async override Task<User?> FindByIdAsync(int id)
         {
             return await _context.Set<User>()
-                .Where(t => t.Id == id)
+                .Where(t => t.IdUsuario == id)
                 .FirstOrDefaultAsync();
         }
     }

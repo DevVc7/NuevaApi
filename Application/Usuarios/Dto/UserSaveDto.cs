@@ -4,9 +4,10 @@ namespace Application.Usuarios.Dto
 {
     public class UserSaveDto
     {
-        public string? Email { get; set; } 
-        public string? Name { get; set; }
-        public string? Password { get; set; } 
-        public string? Rol { get; set; }
+        public string? Nombres { get; set; }
+        public string? Apellidos { get; set; }
+        public string? Correo { get; set; }
+        public string? Password { get; set; }
+        public string? NroDocumento { get; set; }
     }
 }

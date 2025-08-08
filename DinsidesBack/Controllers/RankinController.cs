@@ -1,8 +1,8 @@
-﻿using Application.Studens.Dtos.Students;
+﻿using Application.Estudiant.Dtos.Students;
 using Application.Studens.Services.Interface;
 using Domain;
+using Domain.View;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
@@ -21,7 +21,7 @@ namespace DinsidesBack.Controllers
 
         [HttpGet]
         [AllowAnonymous]
-        public async Task<Results<BadRequest, Ok<IReadOnlyList<StudentsDto>>>> Get()
+        public async Task<Results<BadRequest, Ok<IReadOnlyList<EstudianteDto>>>> Get()
         {
 
             var response = await _studentServices.FindAllAsync();
@@ -33,7 +33,7 @@ namespace DinsidesBack.Controllers
 
         [HttpGet("{id}")]
         [AllowAnonymous]
-        public async Task<Results<BadRequest, Ok<StudentsDto>>> Get(Guid id)
+        public async Task<Results<BadRequest, Ok<EstudianteDto>>> Get(int id)
         {
             var response = await _studentServices.FindByIdAsync(id);
 
@@ -45,7 +45,7 @@ namespace DinsidesBack.Controllers
 
         [HttpPost]
         [AllowAnonymous]
-        public async Task<Results<BadRequest, Ok<OperationResult<StudentsDto>>>> Post([FromBody] StudentsSaveDto request)
+        public async Task<Results<BadRequest, Ok<OperationResult<EstudianteDto>>>> Post([FromBody] EstudianteSaveDto request)
         {
 
             var response = await _studentServices.CreateAsync(request);
@@ -57,7 +57,7 @@ namespace DinsidesBack.Controllers
 
         [HttpPut("{id}")]
         [AllowAnonymous]
-        public async Task<Results<BadRequest, Ok<OperationResult<StudentsDto>>>> Put(Guid id, [FromBody] StudentsSaveDto request)
+        public async Task<Results<BadRequest, Ok<OperationResult<EstudianteDto>>>> Put(int id, [FromBody] EstudianteSaveDto request)
         {
 
             var response = await _studentServices.EditAsync(id, request);
@@ -69,7 +69,7 @@ namespace DinsidesBack.Controllers
 
         [HttpDelete("{id}")]
         [AllowAnonymous]
-        public async Task<Results<BadRequest, Ok<OperationResult<StudentsDto>>>> Delete(Guid id)
+        public async Task<Results<BadRequest, Ok<OperationResult<EstudianteDto>>>> Delete(int id)
         {
 
             var response = await _studentServices.DisabledAsync(id);
@@ -82,7 +82,7 @@ namespace DinsidesBack.Controllers
 
         [HttpGet("all")]
         [AllowAnonymous]
-        public async Task<Results<BadRequest, Ok<StudentsMeta<Student>>>> BusquedaPaginado()
+        public async Task<Results<BadRequest, Ok<StudentsMeta<Estudiante>>>> BusquedaPaginado()
         {
 
             var response = await _studentServices.BusquedaPaginado();

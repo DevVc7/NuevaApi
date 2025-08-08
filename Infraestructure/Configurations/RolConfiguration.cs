@@ -10,29 +10,17 @@ namespace Infraestructure.Configurations
         {
             builder.ToTable("Rol");
 
-            builder.HasKey(e => e.Id);
+            builder.HasKey(e => e.IdRol);
 
-            builder.Property(e => e.Id)
-                .HasColumnName("id")
-                .ValueGeneratedOnAdd();
-
-            builder.Property(e => e.Name)
-                .HasColumnName("name")
-                .HasMaxLength(255)
-                .IsRequired();
-
-            builder.Property(e => e.Status)
-                .HasColumnName("status")
-                .HasDefaultValue(true)
-                .IsRequired();
-
-            builder.Property(e => e.CreateAt)
-            .HasColumnName("createAt")
-            .HasDefaultValueSql("SYSDATETIME()");
-
-            builder.Property(e => e.UpdatedAt)
-                .HasColumnName("updatedAt")
-                .HasDefaultValueSql("SYSDATETIME()");
+            builder.Property(e => e.IdRol).HasColumnName("IdRol");
+            builder.Property(e => e.Descripcion).HasColumnName("Descripcion");
+            builder.Property(e => e.Estado).HasColumnName("Estado");
+            builder.Property(e => e.CreatedAt).HasColumnName("created_at");
+            builder.Property(e => e.UpdatedAt).HasColumnName("updated_at");
+            builder.Property(e => e.DeletedAt).HasColumnName("deleted_at");
+            builder.Property(e => e.CreatedBy).HasColumnName("created_by");
+            builder.Property(e => e.UpdatedBy).HasColumnName("updated_by");
+            builder.Property(e => e.DeletedBy).HasColumnName("deleted_by");
         }
     }
 }

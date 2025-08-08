@@ -5,7 +5,7 @@ using Domain;
 
 namespace Application.Usuarios.Services.Interface
 {
-    public interface IUserService : ICurdCoreService<UserDto, UserSaveDto, Guid>
+    public interface IUserService : ICurdCoreService<UserDto, UserRolSaveDto, int>
     {
         Task<LoginDto> LoginAsync(LoginRequest userAuthDto);
     }

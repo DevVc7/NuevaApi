@@ -11,7 +11,18 @@ namespace Application.Usuarios.Dto
     {
         public string? AccessToken { get; set; }
         public string? RefreshToken { get; set; }
-        public UserDto? User { get; set; }
+        public UserView? User { get; set; }
+    }
+
+
+    public class UserView
+    {
+        public int Id { get; set; }
+        public string? Name { get; set; }
+        public string? Email { get; set; }
+        public string? Type { get; set; }
+        public string? Grade { get; set; }
+        public string? Rol { get; set; }
     }
 
 }

@@ -8,19 +8,27 @@ namespace Infraestructure.Configurations
     {
         public void Configure(EntityTypeBuilder<User> builder)
         {
-            builder.ToTable("users");
+            builder.ToTable("Usuarios");
 
-            builder.HasKey(e => e.Id);
+            builder.HasKey(e => e.IdUsuario);
 
-            builder.Property(e => e.Id).HasColumnName("id");
-            builder.Property(e => e.Email).HasColumnName("email");
-            builder.Property(e => e.Password).HasColumnName("password");
-            builder.Property(e => e.Name).HasColumnName("name");
-            builder.Property(e => e.Role).HasColumnName("role");
-            builder.Property(e => e.CreateAt).HasColumnName("created_at");
+            builder.Property(e => e.IdUsuario).HasColumnName("IdUsuario");
+            builder.Property(e => e.NombreCompleto).HasColumnName("NombreCompleto");
+            builder.Property(e => e.Nombres).HasColumnName("Nombres");
+            builder.Property(e => e.Apellidos).HasColumnName("Apellidos");
+            builder.Property(e => e.Correo).HasColumnName("Correo");
+            builder.Property(e => e.Password).HasColumnName("Password");
+            builder.Property(e => e.NroDocumento).HasColumnName("NroDocumento");
+            builder.Property(e => e.Estado).HasColumnName("Estado");
+            builder.Property(e => e.CreatedAt).HasColumnName("created_at");
             builder.Property(e => e.UpdatedAt).HasColumnName("updated_at");
+            builder.Property(e => e.DeletedAt).HasColumnName("deleted_at");
+            builder.Property(e => e.CreatedBy).HasColumnName("created_by");
+            builder.Property(e => e.UpdatedBy).HasColumnName("updated_by");
+            builder.Property(e => e.DeletedBy).HasColumnName("deleted_by");
 
-            
+
+
         }
     }
 }

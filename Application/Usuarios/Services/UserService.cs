@@ -18,53 +18,62 @@ namespace Application.Usuarios.Services
     {
         private readonly IMapper _mapper;
         private readonly IUsuarioRepositorio _usuarioRepositorio;
-        private readonly IPersonaRepositorio _personaRepositorio;
+        private readonly IRolRepositorio _rolRepositorio;
+        private readonly IRolUsuarioRepositorio _rolUsuarioRepositorio;
         private readonly IJwtServices _securityService;
         private readonly IConfiguration _configuration;
         private readonly ILogger<UserService> _logger;
-        public UserService(IMapper mapper, IPersonaRepositorio personaRepositorio,IUsuarioRepositorio usuarioRepositorio, IJwtServices securityService, IConfiguration configuration, ILogger<UserService> logger)
+        public UserService(IMapper mapper, IRolUsuarioRepositorio rolUsuarioRepositorio , IRolRepositorio rolRepositorio ,IUsuarioRepositorio usuarioRepositorio, IJwtServices securityService, IConfiguration configuration, ILogger<UserService> logger)
         {
             _mapper = mapper;
-            _personaRepositorio = personaRepositorio;
+            _rolRepositorio = rolRepositorio;
+            _rolUsuarioRepositorio = rolUsuarioRepositorio;
             _usuarioRepositorio = usuarioRepositorio;
             _securityService = securityService;
             _configuration = configuration;
             _logger = logger;
         }
 
-        public async Task<OperationResult<UserDto>> CreateAsync(UserSaveDto saveDto)
+        public async Task<OperationResult<UserDto>> CreateAsync(UserRolSaveDto saveDto)
         {
-            var VEmail = await _usuarioRepositorio.FindByEmailAsync(saveDto.Email);
+            var user = _mapper.Map<User>(saveDto.User);
+            var rol = _mapper.Map<Rol>(saveDto.Rol);
 
-            if (VEmail != null) {
-                
-                return new OperationResult<UserDto>()
-                {
-                    State = false,
-                    Data = null,
-                    Message = "Esta Correo ya esta registrado"
-                };
-            }
+            var email = await _usuarioRepositorio.FindByEmailAsync(user.Correo);
 
-            User user = _mapper.Map<User>(saveDto);
+            if (email != null) throw new NotFoundCoreException("Correo ya Registrado");
 
-            user.CreateAt = DateTime.Now;
-            user.UpdatedAt = DateTime.Now;
-            user.Password = _securityService.HashPassword(saveDto.Email, user.Password);
+            user.Estado = true;
+            user.CreatedAt = DateTime.Now;
+            user.Password = _securityService.HashPassword(user.Correo, user.Password);
+            user.NombreCompleto = $"{user.Nombres} {user.Apellidos}";
             
             await _usuarioRepositorio.SaveAsync(user);
-            
-            var newUser =  _mapper.Map<UserDto>(user);
+
+            rol.CreatedAt = DateTime.Now;
+            rol.Estado = true;
+
+            await _rolRepositorio.SaveAsync(rol);
+
+            var rol_usuario = new RolUser();
+
+            rol_usuario.IdRol = rol.IdRol;
+            rol_usuario.IdUsuario = user.IdUsuario;
+            rol_usuario.Estado = true;
+            rol_usuario.CreatedAt = DateTime.Now;
+
+            await _rolUsuarioRepositorio.SaveAsync(rol_usuario);
+
 
             return new OperationResult<UserDto>()
             {
                 State = true,
-                Data = newUser,
+                Data = _mapper.Map<UserDto>(user),
                 Message = "Usuario creado con exito"
             };
         }
 
-        public async Task<OperationResult<UserDto>> DisabledAsync(Guid id)
+        public async Task<OperationResult<UserDto>> DisabledAsync(int id)
         {
             var usuario = await _usuarioRepositorio.FindByIdAsync(id);
             
@@ -87,7 +96,7 @@ namespace Application.Usuarios.Services
             };
         }
 
-        public async Task<OperationResult<UserDto>> EditAsync(Guid id, UserSaveDto saveDto)
+        public async Task<OperationResult<UserDto>> EditAsync(int id, UserRolSaveDto saveDto)
         {
             throw new NotImplementedException();
         }
@@ -99,7 +108,7 @@ namespace Application.Usuarios.Services
             return _mapper.Map<IReadOnlyList<UserDto>>(response);
         }
 
-        public async Task<UserDto> FindByIdAsync(Guid id)
+        public async Task<UserDto> FindByIdAsync(int id)
         {
             var response = await _usuarioRepositorio.FindByIdAsync(id);
 
@@ -109,30 +118,12 @@ namespace Application.Usuarios.Services
         public async Task<LoginDto> LoginAsync(LoginRequest userAuthDto)
         {
 
-            var response = await _usuarioRepositorio.FindAllAsync();
-
-            if(response.Count == 0)
-            {
-                User? us = new User()
-                {
-                    Email = userAuthDto.Email,
-                    Password = _securityService.HashPassword(userAuthDto.Email, userAuthDto.Password),
-                    Role = "admin",
-                    Name = "Admin",
-                    CreateAt = DateTime.Now,
-                    UpdatedAt = DateTime.Now
-                };
-
-                await _usuarioRepositorio.SaveAsync(us);
-            }
-
-
             User? user = await _usuarioRepositorio.FindByEmailAsync(userAuthDto.Email);
             
 
             if (user is null) throw new NotFoundCoreException("Usuario no registrado");
             
-            bool isCorrect = _securityService.VerifyHashedPassword(user.Email, user.Password, userAuthDto.Password);
+            bool isCorrect = _securityService.VerifyHashedPassword(user.Correo, user.Password, userAuthDto.Password);
 
             if (!isCorrect) throw new NotFoundCoreException("La contraseña no es correcta");
 
@@ -140,7 +131,17 @@ namespace Application.Usuarios.Services
             
             var user_securiti = _securityService.JwtSecurity(jwtSecretKey);
 
-            var responde_user = _mapper.Map<UserDto>(user);
+            var rol_user = await _rolUsuarioRepositorio.FindByIdAsync(user.IdUsuario);
+
+            var view_user = new UserView()
+            {
+                Id = user.IdUsuario,
+                Name = user.NombreCompleto,
+                Email = user.Correo,
+                Type = rol_user.Rol.Descripcion,
+                Grade = "",
+                Rol = rol_user.Rol.Descripcion
+            };
             
             byte[] randomBytes = RandomNumberGenerator.GetBytes(64);
             
@@ -151,7 +152,7 @@ namespace Application.Usuarios.Services
             {
                 AccessToken = user_securiti.Token,
                 RefreshToken = user_securiti.Token,
-                User = responde_user,
+                User = view_user,
 
             };
 
