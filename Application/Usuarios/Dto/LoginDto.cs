@@ -23,6 +23,7 @@ namespace Application.Usuarios.Dto
         public string? Type { get; set; }
         public string? Grade { get; set; }
         public string? Rol { get; set; }
+
     }
 
 }

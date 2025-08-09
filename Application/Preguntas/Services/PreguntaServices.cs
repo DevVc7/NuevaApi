@@ -81,7 +81,7 @@ namespace Application.Questions.Services
             {
                 State = true,
                 Data = _mapper.Map<PreguntaDto>(pregunta),
-                Message = "Pregunta creado con exito"
+                Message = "Pregunta Eliminada con exito"
             };
         }
 
@@ -109,6 +109,14 @@ namespace Application.Questions.Services
                         _mapper.Map(op, opcion);
 
                         await _opcionRepositorio.SaveAsync(opcion);
+                    }
+                    else
+                    {
+                        var new_op = _mapper.Map<OpcionesRpt>(op);
+                        new_op.IdPregunta = pregunta.IdPregunta;
+                        new_op.Pregunta = null;
+
+                        await _opcionRepositorio.SaveAsync(new_op);
                     }
                 }
             }

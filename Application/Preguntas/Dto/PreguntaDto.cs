@@ -16,7 +16,9 @@ namespace Application.Preguntas.Dto
         public DateTime? CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
         public DateTime? DeletedAt { get; set; }
-        public Grado? Grado { get; set; }
+        public virtual Grado? Grado { get; set; }
+        public virtual Materia? Materia { get; set; }
+        public virtual ICollection<OpcionesRpt>? OpcionesRpt { get; set; }
 
     }
 }

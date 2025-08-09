@@ -64,7 +64,11 @@ namespace Infraestructure.Repositories
 
         public override Task<Pregunta?> FindByIdAsync(int id)
         {
-            var response = _context.Set<Pregunta>().Where(t => t.IdPregunta == id).Include(s => s.Grado).FirstOrDefaultAsync();
+            var response = _context.Set<Pregunta>()
+                .Include(t => t.Materia)
+                .Include(s => s.Grado)
+                .Include(op => op.OpcionesRpt)
+                .FirstOrDefaultAsync(t => t.IdPregunta == id);
             return response;    
         }
 
