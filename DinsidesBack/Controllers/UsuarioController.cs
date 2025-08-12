@@ -1,4 +1,5 @@
-﻿using Application.Usuarios.Dto;
+﻿using Application.Estudiant.Dtos.Students;
+using Application.Usuarios.Dto;
 using Application.Usuarios.Services.Interface;
 using Domain;
 using Microsoft.AspNetCore.Authorization;
@@ -18,6 +19,19 @@ namespace DinsidesBack.Controllers
             _usuarioService = usuarioService;
         }
 
+
+        [HttpPut("{id}")]
+        [AllowAnonymous]
+        public async Task<Results<BadRequest, Ok<OperationResult<UserDto>>>> Put(int id, [FromBody] UserRolSaveDto request)
+        {
+
+            var response = await _usuarioService.EditAsync(id, request);
+
+            if (response != null) return TypedResults.Ok(response);
+
+            return TypedResults.BadRequest();
+        }
+
         [HttpPost]
         [AllowAnonymous]
         public async Task<Results<BadRequest, Ok<OperationResult<UserDto>>>> Post([FromBody] UserRolSaveDto request)
@@ -29,6 +43,19 @@ namespace DinsidesBack.Controllers
 
             return TypedResults.BadRequest();
         }
+
+        [HttpGet("{id}")]
+        [AllowAnonymous]
+        public async Task<Results<BadRequest, Ok<UserDto>>> Get(int id)
+        {
+            var response = await _usuarioService.FindByIdAsync(id);
+
+            if (response != null) return TypedResults.Ok(response);
+
+            return TypedResults.BadRequest();
+
+        }
+
 
         [HttpGet]
         [AllowAnonymous]

@@ -20,12 +20,22 @@ namespace Application.Usuarios.Services
         private readonly IUsuarioRepositorio _usuarioRepositorio;
         private readonly IRolRepositorio _rolRepositorio;
         private readonly IRolUsuarioRepositorio _rolUsuarioRepositorio;
+        private readonly IEscuelaRepositorio _escuelaRepositorio;
         private readonly IJwtServices _securityService;
         private readonly IConfiguration _configuration;
         private readonly ILogger<UserService> _logger;
-        public UserService(IMapper mapper, IRolUsuarioRepositorio rolUsuarioRepositorio , IRolRepositorio rolRepositorio ,IUsuarioRepositorio usuarioRepositorio, IJwtServices securityService, IConfiguration configuration, ILogger<UserService> logger)
+        public UserService(
+            IMapper mapper,
+            IEscuelaRepositorio escuelaRepositorio,
+            IRolUsuarioRepositorio rolUsuarioRepositorio , 
+            IRolRepositorio rolRepositorio ,
+            IUsuarioRepositorio usuarioRepositorio, 
+            IJwtServices securityService, 
+            IConfiguration configuration, 
+            ILogger<UserService> logger)
         {
             _mapper = mapper;
+            _escuelaRepositorio = escuelaRepositorio;
             _rolRepositorio = rolRepositorio;
             _rolUsuarioRepositorio = rolUsuarioRepositorio;
             _usuarioRepositorio = usuarioRepositorio;
@@ -98,7 +108,27 @@ namespace Application.Usuarios.Services
 
         public async Task<OperationResult<UserDto>> EditAsync(int id, UserRolSaveDto saveDto)
         {
-            throw new NotImplementedException();
+            User? user = await _usuarioRepositorio.FindByIdAsync(id);
+
+            if (user == null) throw new NotFoundCoreException("Usuario no Registrado con ese id");
+
+            user.Estado = true;
+            user.CreatedAt = DateTime.Now;
+            user.Password = user.Password;
+            user.NombreCompleto = saveDto.User.NombreCompleto;
+            user.Photo = saveDto.User.Photo;
+            user.Biografia = saveDto.User.Biografia;
+            user.IdEscuela = saveDto.User.IdEscuela;
+
+            await _usuarioRepositorio.SaveAsync(user);
+
+            return new OperationResult<UserDto>()
+            {
+                State = true,
+                Data = _mapper.Map<UserDto>(user),
+                Message = "Usuario actualizado con exito"
+            };
+
         }
 
         public async Task<IReadOnlyList<UserDto>> FindAllAsync()
@@ -159,6 +189,8 @@ namespace Application.Usuarios.Services
             return userSecurity;
         }
 
+
+        
        
     }
 }

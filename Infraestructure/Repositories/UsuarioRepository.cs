@@ -33,6 +33,7 @@ namespace Infraestructure.Repositories
         public async override Task<User?> FindByIdAsync(int id)
         {
             return await _context.Set<User>()
+                .Include(t => t.Escuela)
                 .Where(t => t.IdUsuario == id)
                 .FirstOrDefaultAsync();
         }

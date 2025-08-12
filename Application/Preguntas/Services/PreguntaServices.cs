@@ -81,7 +81,7 @@ namespace Application.Questions.Services
             {
                 State = true,
                 Data = _mapper.Map<PreguntaDto>(pregunta),
-                Message = "Pregunta Eliminada con exito"
+                Message = "Pregunta Eliminad con exito"
             };
         }
 
