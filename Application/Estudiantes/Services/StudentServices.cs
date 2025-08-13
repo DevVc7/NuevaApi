@@ -6,7 +6,6 @@ using AutoMapper;
 using Domain;
 using Domain.View;
 using Infraestructure.Repositories.Interfaces;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Application.Estudiantes.Services
 {
