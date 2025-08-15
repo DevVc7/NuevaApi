@@ -200,7 +200,7 @@ namespace Application.Materias.Services
                     }
                     else
                     {
-                        var new_curso = _mapper.Map<Leccion>(curso);
+                        var new_curso = _mapper.Map<Leccion>(leccion);
 
                         new_curso.IdLeccion = null;
                         new_curso.IdCurso = curso.IdCurso;

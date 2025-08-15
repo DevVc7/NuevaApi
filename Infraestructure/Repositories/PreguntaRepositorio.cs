@@ -22,7 +22,8 @@ namespace Infraestructure.Repositories
                 .Include(q => q.Grado)
                 .Include(q => q.Materia)
                 .Include(q => q.OpcionesRpt)
-                .Where(q => q.Estado);
+                .Where(q => q.Estado)
+                .OrderByDescending(t => t.IdPregunta);
 
             var subjectCounts = await query
                 .GroupBy(q => q.Materia.Descripcion)
