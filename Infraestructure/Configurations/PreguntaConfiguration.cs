@@ -20,6 +20,8 @@ namespace Infraestructure.Configurations
             builder.Property(e => e.Puntaje).HasColumnName("Puntaje").HasPrecision(10, 2);
             builder.Property(e => e.Estado).HasColumnName("Estado");
             builder.Property(e => e.IdMateria).HasColumnName("IdMateria");
+            builder.Property(e => e.idCurso).HasColumnName("idCurso");
+            builder.Property(e => e.IdLeccion).HasColumnName("IdLeccion");
             builder.Property(e => e.IdGrado).HasColumnName("IdGrado");
             builder.Property(e => e.CreatedAt).HasColumnName("created_at");
             builder.Property(e => e.UpdatedAt).HasColumnName("updated_at");

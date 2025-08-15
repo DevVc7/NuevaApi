@@ -13,6 +13,8 @@ namespace Domain
         public bool Estado { get; set; }
         public int? IdGrado { get; set; }
         public int? IdMateria { get; set; }
+        public int? idCurso { get; set; }
+        public int? IdLeccion { get; set; }
         public DateTime? CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
         public DateTime? DeletedAt { get; set; }

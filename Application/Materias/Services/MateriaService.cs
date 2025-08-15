@@ -17,12 +17,14 @@ namespace Application.Materias.Services
     {
         public readonly ICursoRepositorio _cursoRepositorio;
         public readonly IMateriaRepositorio _materiaRepositorio;
+        public readonly ILeccionRepositorio _leccionRepositorio;
         public readonly IMapper _mapper;
 
-        public MateriaService(ICursoRepositorio cursoRepositorio, IMateriaRepositorio materiaRepositorio, IMapper mapper)
+        public MateriaService(ILeccionRepositorio leccionRepositorio,ICursoRepositorio cursoRepositorio, IMateriaRepositorio materiaRepositorio, IMapper mapper)
         {
             _cursoRepositorio = cursoRepositorio;
             _materiaRepositorio = materiaRepositorio;
+            _leccionRepositorio = leccionRepositorio;
             _mapper = mapper;
         }
 
@@ -49,6 +51,8 @@ namespace Application.Materias.Services
                     curs.CreatedAt = DateTime.Now;
                     curs.Estado = true;
                     curs.IdMateria = materia.IdMateria;
+                    curs.Materia = null;
+                    curs.IdCurso = null;
 
                     await _cursoRepositorio.SaveAsync(curs);
                 }
@@ -70,9 +74,9 @@ namespace Application.Materias.Services
 
             var materia = await _materiaRepositorio.FindByIdAsync(id);
 
-            if (materia != null) return new OperationResult<MateriaDto>() { Data = _mapper.Map<MateriaDto>(materia), Message = "Nombre de Materia ya esta Inscrito", State = false };
+            if (materia == null) return new OperationResult<MateriaDto>() { Data = _mapper.Map<MateriaDto>(materia), Message = "Nombre de Materia ya esta Inscrito", State = false };
 
-            materia.Estado = false;
+            materia.Estado = !materia.Estado;
             materia.DeletedAt = DateTime.Now;
 
             await _materiaRepositorio.SaveAsync(materia);
@@ -113,9 +117,13 @@ namespace Application.Materias.Services
                     else
                     {
                         var new_curso = _mapper.Map<Curso>(curso);
-                        new_curso.CreatedAt = DateTime.Now;
+                        
+                        new_curso.IdCurso = null;
                         new_curso.IdMateria = materia.IdMateria;
+                        new_curso.CreatedAt = DateTime.Now;
                         new_curso.Estado = true;
+                        new_curso.Materia = null;
+
                         await _cursoRepositorio.SaveAsync(new_curso);
                     }
                 }
@@ -127,6 +135,28 @@ namespace Application.Materias.Services
                 Data = _mapper.Map<MateriaDto>(materia),
                 Message = "Materia actualizado con exito"
             };
+        }
+
+        public async Task<CursoDto> FecthByIdCu(int idCurso)
+        {
+            var response = await _cursoRepositorio.FindByIdAsync(idCurso);
+
+            return _mapper.Map<CursoDto>(response);
+        }
+
+        public async Task<IReadOnlyList<LeccionDto>> FecthByIdCurso(int idCurso)
+        {
+            var response = await _leccionRepositorio.FindByIdCursoAsync(idCurso);
+
+            return _mapper.Map<IReadOnlyList<LeccionDto>>(response);
+        }
+
+        public async Task<IReadOnlyList<CursoDto>> FecthByIdMateria(int idMateria)
+        {
+            var response = await _cursoRepositorio.FindByIdMateriaAsync(idMateria);
+
+            return _mapper.Map<IReadOnlyList<CursoDto>>(response);
+
         }
 
         public async Task<IReadOnlyList<MateriaDto>> FindAllAsync()
@@ -141,6 +171,54 @@ namespace Application.Materias.Services
             var response = await _materiaRepositorio.FindByIdAsync(id);
 
             return _mapper.Map<MateriaDto>(response);
+        }
+
+        public async Task<OperationResult<CursoDto>> SaveCursoLeccion(int id, CursoLeccionSaveDto saveDto)
+        {
+            var curso = await _cursoRepositorio.FindByIdAsync(id);
+
+            if (curso == null) return new OperationResult<CursoDto>() { Data = _mapper.Map<CursoDto>(curso), Message = "No hay Registro con ese Id", State = false };
+
+            curso.UpdatedAt = DateTime.Now;
+            curso.Estado = true;
+
+            _mapper.Map(saveDto.CursoSaveDto, curso);
+
+            await _cursoRepositorio.SaveAsync(curso);
+
+
+            if (saveDto.LeccionSaveDtoList != null && saveDto.LeccionSaveDtoList.Count != 0)
+            {
+                foreach (var leccion in saveDto.LeccionSaveDtoList)
+                {
+                    var cl = await _leccionRepositorio.FindByIdAsync(leccion.IdLeccion);
+
+                    if (cl != null)
+                    {
+                        _mapper.Map(leccion, cl);
+                        await _leccionRepositorio.SaveAsync(cl);
+                    }
+                    else
+                    {
+                        var new_curso = _mapper.Map<Leccion>(curso);
+
+                        new_curso.IdLeccion = null;
+                        new_curso.IdCurso = curso.IdCurso;
+                        new_curso.CreatedAt = DateTime.Now;
+                        new_curso.Estado = true;
+                        new_curso.Curso = null;
+
+                        await _leccionRepositorio.SaveAsync(new_curso);
+                    }
+                }
+            }
+
+            return new OperationResult<CursoDto>()
+            {
+                State = true,
+                Data = _mapper.Map<CursoDto>(curso),
+                Message = "curso creado con exito"
+            };
         }
     }
 }

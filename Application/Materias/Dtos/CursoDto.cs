@@ -9,6 +9,7 @@ namespace Application.Materias.Dtos
         public string? Nombre { get; set; }
         public bool Estado { get; set; }
         public DateTime? CreatedAt { get; set; }
-        public virtual Materia? Materia { get; set; }
+        public virtual ICollection<Leccion>? Leccion { get; set; }
+
     }
 }

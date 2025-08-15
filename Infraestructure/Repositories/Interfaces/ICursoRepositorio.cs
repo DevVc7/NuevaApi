@@ -10,5 +10,7 @@ namespace Infraestructure.Repositories.Interfaces
 {
     public interface ICursoRepositorio : ICurdCoreRespository<Curso, int>
     {
+        Task<IReadOnlyList<Curso>> FindByIdMateriaAsync(int id);
+        Task<Curso> FechtNameCurso(string name);
     }
 }

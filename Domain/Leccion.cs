@@ -2,10 +2,10 @@
 
 namespace Domain
 {
-    public class Curso
+    public class Leccion
     {
+        public int? IdLeccion { get; set; }
         public int? IdCurso { get; set; }
-        public int? IdMateria { get; set; }
         public string? Nombre { get; set; }
         public bool Estado { get; set; }
         public DateTime? CreatedAt { get; set; }
@@ -15,9 +15,7 @@ namespace Domain
         public int? CreatedBy { get; set; }
         public int? UpdatedBy { get; set; }
         public int? DeletedBy { get; set; }
-        public virtual ICollection<Leccion>? Leccion { get; set; }
         [JsonIgnore]
-        public virtual Materia? Materia { get; set; }
-
+        public virtual Curso? Curso { get; set; }
     }
 }

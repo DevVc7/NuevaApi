@@ -25,7 +25,7 @@ namespace Infraestructure.Repositories
         {
             var response = await _dbContext.Set<Materia>().
                 Include(t => t.Cursos).
-                Where(t => t.Estado).ToListAsync();
+                Where(t => t.Estado ).ToListAsync();
 
             return response;
         }

@@ -1,11 +1,6 @@
 ﻿using Application.Materias.Dtos.SaveDtos;
 using AutoMapper;
 using Domain;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Application.Materias.Dtos.Profiles
 {
@@ -19,6 +14,9 @@ namespace Application.Materias.Dtos.Profiles
             
             CreateMap<Curso , CursoDto>().ReverseMap();
             CreateMap<Curso , CursoSaveDto>().ReverseMap();
+
+            CreateMap<Leccion, LeccionDto>().ReverseMap();
+            CreateMap<Leccion, LeccionSaveDto>().ReverseMap();
         }
     }
 }
