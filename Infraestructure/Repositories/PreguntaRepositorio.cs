@@ -89,7 +89,7 @@ namespace Infraestructure.Repositories
                 .Include(q => q.Grado)
                 .Include(q => q.Materia)
                 .Include(q => q.OpcionesRpt)
-                .Where(t => t.IdMateria == view.IdMateria && t.idCurso == view.IdCurso && t.IdGrado == view.IdGrado).ToListAsync();
+                .Where(t => t.IdMateria == view.IdMateria && t.idCurso == view.IdCurso && t.IdGrado == view.IdGrado && t.Estado).ToListAsync();
 
             return response;
         }
