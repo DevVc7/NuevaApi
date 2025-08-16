@@ -8,5 +8,6 @@ namespace Application.Preguntas.Services.Interfaces
     public interface IPreguntaServices : ICurdCoreService<PreguntaDto, QuestionRequestDto, int>
     {
         Task<QuestionDataResponse> BusquedaPaginado();
+        Task<IReadOnlyList<PreguntaDto>> FindAllMateriaAsync(int id);
     }
 }

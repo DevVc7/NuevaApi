@@ -74,6 +74,16 @@ namespace Infraestructure.Repositories
         }
 
 
+        public async Task<IReadOnlyList<Pregunta>> FindAllMateriaAsync(int id)
+        {
+            var response = await _context.Set<Pregunta>()
+                .Include(s => s.Materia).ThenInclude(c => c.Cursos)
+                .Where(t => t.IdMateria == id && t.Estado ).ToListAsync();
+
+            return response;
+        }
+
+
         private string MapDifficulty(byte? level)
         {
             return level switch

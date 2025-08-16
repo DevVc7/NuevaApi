@@ -136,6 +136,13 @@ namespace Application.Questions.Services
             return _mapper.Map<IReadOnlyList<PreguntaDto>>(response);
         }
 
+        public async Task<IReadOnlyList<PreguntaDto>> FindAllMateriaAsync(int id)
+        {
+            var response = await _questionRepositorio.FindAllMateriaAsync(id);
+
+            return _mapper.Map<IReadOnlyList<PreguntaDto>>(response);
+        }
+
         public async Task<PreguntaDto> FindByIdAsync(int id)
         {
             var response = await _questionRepositorio.FindByIdAsync(id);

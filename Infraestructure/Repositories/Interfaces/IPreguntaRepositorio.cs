@@ -7,5 +7,6 @@ namespace Infraestructure.Repositories.Interfaces
     public interface IPreguntaRepositorio : ICurdCoreRespository<Pregunta, int>
     {
         Task<QuestionDataResponse> BusquedaPaginado();
+        Task<IReadOnlyList<Pregunta>> FindAllMateriaAsync(int id);
     }
 }
