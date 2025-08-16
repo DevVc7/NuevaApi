@@ -19,17 +19,22 @@ namespace Application.Questions.Services
         private readonly IMateriaRepositorio _subjectRepositorio;
         private readonly IOpcionRepositorio _opcionRepositorio;
         private readonly IRespuestaUsuarioRepositorio _respuestaUsuarioRepositorio;
+        private readonly IPredictionService _predictionService;
 
         public PreguntaServices(
             IPreguntaRepositorio questionRepositorio, 
             IOpcionRepositorio opcionRepositorio, 
-            IMapper mapper, IMateriaRepositorio subjectRepositorio, IRespuestaUsuarioRepositorio respuestaUsuarioRepositorio)
+            IMapper mapper, 
+            IMateriaRepositorio subjectRepositorio, 
+            IRespuestaUsuarioRepositorio respuestaUsuarioRepositorio,
+            IPredictionService predictionService)
         {
             _questionRepositorio = questionRepositorio;
             _mapper = mapper;
             _subjectRepositorio = subjectRepositorio;
             _opcionRepositorio = opcionRepositorio;
             _respuestaUsuarioRepositorio = respuestaUsuarioRepositorio;
+            _predictionService = predictionService;
         }
 
         public async Task<QuestionDataResponse> BusquedaPaginado()
@@ -167,19 +172,6 @@ namespace Application.Questions.Services
         public async Task<OperationResult<RespuestaUsuarioDto>> SaveRespuesta(RespuestaUsuarioSaveDto saveDto)
         {
             var respuesta = _mapper.Map<RespuestaUsuario>(saveDto);
-            
-            var valid = await _respuestaUsuarioRepositorio.FindByIdUsuarioAsync(saveDto.IdUsuario, saveDto.IdPregunta);
-
-            if(valid != null)
-            {
-                return new OperationResult<RespuestaUsuarioDto>()
-                {
-                    State = true,
-                    Data = _mapper.Map<RespuestaUsuarioDto>(respuesta),
-                    Message = "Respuesta ya esta  registrada con exito"
-                };
-            }
-
 
             respuesta.FechaRespuesta = DateTime.Now;
 
@@ -224,40 +216,21 @@ namespace Application.Questions.Services
         // -----------------------------------------------------------------
         public async Task<PreguntaDto> GetNextAdaptiveQuestionAsync(int idUsuario, int idPreguntaRespondida)
         {
-            // Paso 1: Obtener los metadatos de la pregunta que acaba de ser respondida.
             var lastQuestion = await _questionRepositorio.FindByIdAsync(idPreguntaRespondida);
+            if (lastQuestion == null || !lastQuestion.idCurso.HasValue) return null;
 
-            if (lastQuestion == null) return null;
+            var nextQuestionId = await _predictionService.GetNextQuestion(idUsuario, lastQuestion.idCurso.Value);
 
-            // Paso 2: Obtener el resultado de la última respuesta del usuario.
-            var lastAnswer = await _respuestaUsuarioRepositorio.FindLastAnswerForQuestionAsync(idUsuario, idPreguntaRespondida);
+            if (nextQuestionId == 0) return null;
 
-            // Paso 3: Validar que la pregunta tiene la información necesaria para la lógica adaptativa.
-            if (!lastQuestion.IdLeccion.HasValue || string.IsNullOrEmpty(lastQuestion.Dificultad) || !lastQuestion.idCurso.HasValue)
-            {
-                return null; 
-            }
+            var nextQuestion = await _questionRepositorio.FindAdaptiveQuestionByIdAsync(nextQuestionId);
+            return _mapper.Map<PreguntaDto>(nextQuestion);
+        }
 
-            if (lastAnswer.PuntajeObtenido > 0) 
-            {
-                var nextQuestion = await _questionRepositorio.FindNextDifficultyAsync(lastQuestion.IdLeccion.Value, lastQuestion.Dificultad);
-
-                if (nextQuestion != null)
-                {
-                    return _mapper.Map<PreguntaDto>(nextQuestion);
-                }
-                else
-                {
-                    var nextLessonQuestion = await _questionRepositorio.FindNextLessonEasiestQuestionAsync(lastQuestion.idCurso.Value, lastQuestion.IdLeccion.Value);
-                    return _mapper.Map<PreguntaDto>(nextLessonQuestion);
-                }
-            }
-            else
-            {
-                var nextQuestion = await _questionRepositorio.FindPreviousDifficultyAsync(lastQuestion.IdLeccion.Value, lastQuestion.Dificultad);
-
-                return _mapper.Map<PreguntaDto>(nextQuestion);
-            }
+        public async Task<bool> ResetAdaptiveTestAsync(int idUsuario, int idCurso)
+        {
+            var rowsAffected = await _respuestaUsuarioRepositorio.DeleteByUserIdAndCourseIdAsync(idUsuario, idCurso);
+            return rowsAffected > 0;
         }
     }
 }

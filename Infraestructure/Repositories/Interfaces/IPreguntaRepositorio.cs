@@ -1,4 +1,4 @@
-﻿using Domain;
+using Domain;
 using Domain.View;
 using Infraestructure.Core.Repositories.Interfaces;
 
@@ -14,5 +14,7 @@ namespace Infraestructure.Repositories.Interfaces
         Task<Pregunta?> FindNextDifficultyAsync(int idLeccion, string dificultadActual);
         Task<Pregunta?> FindPreviousDifficultyAsync(int idLeccion, string dificultadActual);
         Task<Pregunta?> FindNextLessonEasiestQuestionAsync(int idCurso, int idLeccionActual);
+        Task<IReadOnlyList<Pregunta>> FindAllByCourseAsync(int idCurso);
+        Task<Pregunta?> FindAdaptiveQuestionByIdAsync(int id);
     }
 }

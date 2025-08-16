@@ -1,4 +1,4 @@
-﻿using Domain;
+using Domain;
 using Infraestructure.Contexts;
 using Infraestructure.Core.Repositories;
 using Infraestructure.Repositories.Interfaces;
@@ -44,7 +44,7 @@ namespace Infraestructure.Repositories
         public async Task<bool> HasHistoryAsync(int idUsuario, int idCurso)
         {
             return await _dbContext.Set<RespuestaUsuario>()
-                .Include(r => r.IdPregunta)
+                .Include(r => r.Pregunta)
                 .AnyAsync(r => r.IdUsuario == idUsuario && r.Pregunta.idCurso == idCurso);
         }
 
@@ -63,6 +63,45 @@ namespace Infraestructure.Repositories
                 .Where(r => r.IdUsuario == idUsuario && r.IdPregunta == idPregunta)
                 .OrderByDescending(r => r.FechaRespuesta)
                 .FirstOrDefaultAsync();
+        }
+
+        public async Task<IReadOnlyList<RespuestaUsuario>> GetAllAsync()
+        {
+            return await _dbContext.Set<RespuestaUsuario>().ToListAsync();
+        }
+
+        public async Task<IReadOnlyList<RespuestaUsuario>> FindAllByUserAsync(int idUsuario, int idCurso)
+        {
+            var questionIdsInCourse = await _dbContext.Set<Pregunta>()
+                .Where(p => p.idCurso == idCurso)
+                .Select(p => p.IdPregunta)
+                .ToListAsync();
+
+            return await _dbContext.Set<RespuestaUsuario>()
+                .Where(r => r.IdUsuario == idUsuario && questionIdsInCourse.Contains(r.IdPregunta))
+                .ToListAsync();
+        }
+
+        public async Task<int> DeleteByUserIdAndCourseIdAsync(int userId, int courseId)
+        {
+            // 1. Encontrar los Ids de las preguntas del curso.
+            var questionIds = await _dbContext.Set<Pregunta>()
+                                            .Where(p => p.idCurso == courseId)
+                                            .Select(p => p.IdPregunta)
+                                            .ToListAsync();
+
+            if (!questionIds.Any()) return 0;
+
+            // 2. Encontrar las respuestas del usuario para esas preguntas.
+            var answersToDelete = await _dbContext.Set<RespuestaUsuario>()
+                                                .Where(r => r.IdUsuario == userId && questionIds.Contains(r.IdPregunta))
+                                                .ToListAsync();
+
+            if (!answersToDelete.Any()) return 0;
+
+            // 3. Eliminar las respuestas y guardar los cambios.
+            _dbContext.Set<RespuestaUsuario>().RemoveRange(answersToDelete);
+            return await _dbContext.SaveChangesAsync();
         }
     }
 }

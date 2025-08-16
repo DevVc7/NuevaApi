@@ -1,4 +1,4 @@
-﻿using Application.Core.Services.Interfaces;
+using Application.Core.Services.Interfaces;
 using Application.Preguntas.Dto;
 using Domain;
 using Domain.View;
@@ -15,6 +15,7 @@ namespace Application.Preguntas.Services.Interfaces
         
         // -- Funciones para el sistema de aprendizaje adaptativo --
         Task<PreguntaDto> GetFirstAdaptiveQuestionAsync(int idUsuario, int idCurso);
-        Task<PreguntaDto> GetNextAdaptiveQuestionAsync(int idUsuario, int idPreguntaRespondida);
+        Task<PreguntaDto?> GetNextAdaptiveQuestionAsync(int idUsuario, int idPreguntaAnterior);
+        Task<bool> ResetAdaptiveTestAsync(int idUsuario, int idCurso);
     }
 }

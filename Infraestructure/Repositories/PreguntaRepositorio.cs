@@ -1,4 +1,4 @@
-﻿using Domain;
+using Domain;
 using Domain.View;
 using Infraestructure.Contexts;
 using Infraestructure.Core.Repositories;
@@ -149,7 +149,10 @@ namespace Infraestructure.Repositories
         {
             // Encuentra la pregunta con la dificultad "Facil" en la primera lección del curso.
             return await _context.Set<Pregunta>()
-                .Where(q => q.idCurso == idCurso && q.Dificultad == "Facil")
+                .Include(q => q.OpcionesRpt) // Incluir opciones de respuesta
+                .Include(q => q.Materia)
+                .Include(q => q.Grado)
+                .Where(q => q.idCurso == idCurso && q.Dificultad == "Facil" && q.Estado)
                 .OrderBy(q => q.IdLeccion)
                 .FirstOrDefaultAsync();
         }
@@ -190,6 +193,22 @@ namespace Infraestructure.Repositories
                 .OrderBy(q => q.IdLeccion)
                 .ThenBy(q => q.Dificultad)
                 .FirstOrDefaultAsync();
+        }
+
+        public async Task<IReadOnlyList<Pregunta>> FindAllByCourseAsync(int idCurso)
+        {
+            return await _context.Set<Pregunta>()
+                .Where(q => q.idCurso == idCurso && q.Estado)
+                .ToListAsync();
+        }
+
+        public async Task<Pregunta?> FindAdaptiveQuestionByIdAsync(int id)
+        {
+            return await _context.Set<Pregunta>()
+                .Include(p => p.Materia)
+                .Include(p => p.Grado)
+                .Include(p => p.OpcionesRpt)
+                .FirstOrDefaultAsync(p => p.IdPregunta == id);
         }
     }
 }

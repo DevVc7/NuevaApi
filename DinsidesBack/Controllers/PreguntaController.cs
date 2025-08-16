@@ -1,4 +1,4 @@
-﻿using Application.Preguntas.Services.Interfaces;
+using Application.Preguntas.Services.Interfaces;
 using Application.Preguntas.Dto;
 using Domain;
 using Domain.View;
@@ -143,6 +143,7 @@ namespace DinsidesBack.Controllers
         // --- ENDPOINTS ADAPTATIVOS ---
 
         [HttpGet("iniciar-sesion-adaptativa")]
+        [AllowAnonymous]
         public async Task<Results<BadRequest, Ok<PreguntaDto>>> IniciarSesionAdaptativa(int idUsuario, int idCurso)
         {
             // servicio para manejar el 'cold start' y obtener la primera pregunta.
@@ -156,23 +157,36 @@ namespace DinsidesBack.Controllers
         }
 
         [HttpPost("siguiente-pregunta-adaptativa")]
-        public async Task<Results<BadRequest, Ok<PreguntaDto>>> PostRespuesta([FromBody] RespuestaUsuarioSaveDto respuesta)
+        [AllowAnonymous]
+        public async Task<IResult> PostRespuesta([FromBody] RespuestaUsuarioSaveDto respuesta)
         {
-            // 1. Guardar la respuesta del usuario en la base de datos.
             var saveResult = await _questionServices.SaveRespuesta(respuesta);
+            if (saveResult == null) return TypedResults.BadRequest("Error al procesar la respuesta.");
 
-            if (saveResult == null) return TypedResults.BadRequest();
-
-            // 2. Usar el ID del usuario y de la pregunta para que el algoritmo decida cuál es la siguiente pregunta óptima.
             var nextQuestion = await _questionServices.GetNextAdaptiveQuestionAsync(respuesta.IdUsuario, respuesta.IdPregunta);
 
-            // 3. Devolver la pregunta adaptativa. Si es nula, significa que el alumno ha terminado el curso o no hay más preguntas disponibles.
-            if (nextQuestion != null)
+            // Si nextQuestion es null, significa que el usuario ha completado todas las preguntas.
+            // Devolvemos un 204 No Content, una señal clara para el frontend de que el test ha finalizado.
+            if (nextQuestion == null)
             {
-                return TypedResults.Ok(nextQuestion);
+                return TypedResults.NoContent();
             }
 
-            return TypedResults.BadRequest();
+            return TypedResults.Ok(nextQuestion);
+        }
+
+        [HttpPost("reiniciar/{idUsuario}/{idCurso}")]
+        [AllowAnonymous]
+        public async Task<IResult> ReiniciarTestAdaptativo(int idUsuario, int idCurso)
+        {
+            var result = await _questionServices.ResetAdaptiveTestAsync(idUsuario, idCurso);
+
+            if (result)
+            {
+                return TypedResults.Ok(new { message = "El progreso del curso ha sido reiniciado." });
+            }
+
+            return TypedResults.BadRequest("No se pudo reiniciar el progreso. Es posible que el usuario no tuviera respuestas en este curso.");
         }
     }
 }
