@@ -21,7 +21,7 @@ namespace Infraestructure.Repositories
             return await _dbContext.Set<Estudiante>().
                 Include(t => t.Usuario).
                 Include(t => t.Grado).
-                FirstOrDefaultAsync(t => t.IdEstudiante == id);
+                FirstOrDefaultAsync(t => t.IdUsuario == id);
         }
 
         public override async Task<IReadOnlyList<Estudiante>> FindAllAsync()
