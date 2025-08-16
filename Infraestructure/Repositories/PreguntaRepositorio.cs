@@ -83,6 +83,17 @@ namespace Infraestructure.Repositories
             return response;
         }
 
+        public async Task<IReadOnlyList<Pregunta>> FindAllQuestionMateria(PreguntaView view)
+        {
+            var response = await _context.Set<Pregunta>()
+                .Include(q => q.Grado)
+                .Include(q => q.Materia)
+                .Include(q => q.OpcionesRpt)
+                .Where(t => t.IdMateria == view.IdMateria && t.idCurso == view.IdCurso && t.IdGrado == view.IdGrado).ToListAsync();
+
+            return response;
+        }
+
 
         private string MapDifficulty(byte? level)
         {

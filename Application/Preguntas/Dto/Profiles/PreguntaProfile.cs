@@ -9,6 +9,9 @@ namespace Application.Preguntas.Dto.Profiles
         {
             CreateMap<Pregunta, PreguntaDto>().ReverseMap();
             CreateMap<Pregunta, PreguntaSaveDto>().ReverseMap();
+
+            CreateMap<RespuestaUsuario, RespuestaUsuarioDto>().ReverseMap();
+            CreateMap<RespuestaUsuario, RespuestaUsuarioSaveDto>().ReverseMap();
         }
     }
 }

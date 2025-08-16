@@ -1,8 +1,11 @@
 ﻿using Application.Materias.Dtos;
 using Application.Materias.Dtos.SaveDtos;
 using Application.Materias.Services.Interfaces;
+using Application.Preguntas.Dto;
 using AutoMapper;
+using Azure;
 using Domain;
+using Domain.View;
 using Infraestructure.Repositories.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -18,14 +21,16 @@ namespace Application.Materias.Services
         public readonly ICursoRepositorio _cursoRepositorio;
         public readonly IMateriaRepositorio _materiaRepositorio;
         public readonly ILeccionRepositorio _leccionRepositorio;
+        public readonly IPreguntaRepositorio _preguntaRepositorio;
         public readonly IMapper _mapper;
 
-        public MateriaService(ILeccionRepositorio leccionRepositorio,ICursoRepositorio cursoRepositorio, IMateriaRepositorio materiaRepositorio, IMapper mapper)
+        public MateriaService(ILeccionRepositorio leccionRepositorio,ICursoRepositorio cursoRepositorio, IMateriaRepositorio materiaRepositorio, IMapper mapper, IPreguntaRepositorio preguntaRepositorio)
         {
             _cursoRepositorio = cursoRepositorio;
             _materiaRepositorio = materiaRepositorio;
             _leccionRepositorio = leccionRepositorio;
             _mapper = mapper;
+            _preguntaRepositorio = preguntaRepositorio;
         }
 
         public async Task<OperationResult<MateriaDto>> CreateAsync(MateriaCursoSaveDto saveDto)
@@ -219,6 +224,33 @@ namespace Application.Materias.Services
                 Data = _mapper.Map<CursoDto>(curso),
                 Message = "curso creado con exito"
             };
+        }
+
+
+
+        public async Task<IReadOnlyList<CursoDto>> FindAllQuestionMateria(int idMateria)
+        {
+            var cursos = new List<Curso>();
+            var response = await _preguntaRepositorio.FindAllMateriaAsync(idMateria);
+
+            if (response != null && response.Count > 0)
+            {
+                var idsCursos = response
+                    .Where(x => x.idCurso.HasValue)
+                    .Select(x => x.idCurso.Value)
+                    .Distinct();
+
+                foreach (var idCurso in idsCursos)
+                {
+                    var curso = await _cursoRepositorio.FindByIdAsync(idCurso);
+                    if (curso != null)
+                    {
+                        cursos.Add(curso);
+                    }
+                }
+            }
+
+            return _mapper.Map<IReadOnlyList<CursoDto>>(cursos);
         }
     }
 }

@@ -9,5 +9,10 @@ namespace Application.Preguntas.Services.Interfaces
     {
         Task<QuestionDataResponse> BusquedaPaginado();
         Task<IReadOnlyList<PreguntaDto>> FindAllMateriaAsync(int id);
+        Task<IReadOnlyList<PreguntaDto>> FindAllQuestionMateria(PreguntaView view);
+
+        Task<OperationResult<RespuestaUsuarioDto>> SaveRespuesta(RespuestaUsuarioSaveDto saveDto);
+        Task<IReadOnlyList<RespuestaUsuarioDto>> FinPreguntaAsync(int id);
+
     }
 }

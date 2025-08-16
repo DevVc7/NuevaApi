@@ -67,5 +67,18 @@ namespace DinsidesBack.Controllers
 
             return TypedResults.BadRequest();
         }
+
+
+        [HttpGet("pregunta/{id}")]
+        [AllowAnonymous]
+        public async Task<Results<BadRequest, Ok<IReadOnlyList<CursoDto>>>> GetPregunta(int id)
+        {
+            var response = await _materiaServices.FindAllQuestionMateria(id);
+
+            if (response != null) return TypedResults.Ok(response);
+
+            return TypedResults.BadRequest();
+
+        }
     }
 }

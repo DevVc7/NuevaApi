@@ -102,5 +102,42 @@ namespace DinsidesBack.Controllers
             return TypedResults.BadRequest();
 
         }
+
+        [HttpPost("question")]
+        [AllowAnonymous]
+        public async Task<Results<BadRequest, Ok<IReadOnlyList<PreguntaDto>>>> GetQuestion([FromBody]  PreguntaView view)
+        {
+            var response = await _questionServices.FindAllQuestionMateria(view);
+
+            if (response != null) return TypedResults.Ok(response);
+
+            return TypedResults.BadRequest();
+
+        }
+
+
+        [HttpPost("respuesta")]
+        [AllowAnonymous]
+        public async Task<Results<BadRequest, Ok<OperationResult<RespuestaUsuarioDto>>>> postRespues([FromBody] RespuestaUsuarioSaveDto view)
+        {
+            var response = await _questionServices.SaveRespuesta(view);
+
+            if (response != null) return TypedResults.Ok(response);
+
+            return TypedResults.BadRequest();
+
+        }
+
+        [HttpGet("respuesta/all/{id}")]
+        [AllowAnonymous]
+        public async Task<Results<BadRequest, Ok<IReadOnlyList<RespuestaUsuarioDto>>>> AllRespuesta(int id)
+        {
+
+            var response = await _questionServices.FinPreguntaAsync(id);
+
+            if (response != null) return TypedResults.Ok(response);
+
+            return TypedResults.BadRequest();
+        }
     }
 }

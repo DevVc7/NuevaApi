@@ -21,6 +21,14 @@ namespace Infraestructure.Repositories
             return await _dbContext.Set<Estudiante>().
                 Include(t => t.Usuario).
                 Include(t => t.Grado).
+                FirstOrDefaultAsync(t => t.IdEstudiante == id);
+        }
+
+        public async  Task<Estudiante?> FindByIdUsuarioAsync(int id)
+        {
+            return await _dbContext.Set<Estudiante>().
+                Include(t => t.Usuario).
+                Include(t => t.Grado).
                 FirstOrDefaultAsync(t => t.IdUsuario == id);
         }
 

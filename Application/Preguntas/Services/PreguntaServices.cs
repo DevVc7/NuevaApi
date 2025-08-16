@@ -16,13 +16,18 @@ namespace Application.Questions.Services
         private readonly IMapper _mapper;
         private readonly IMateriaRepositorio _subjectRepositorio;
         private readonly IOpcionRepositorio _opcionRepositorio;
+        private readonly IRespuestaUsuarioRepositorio _respuestaUsuarioRepositorio;
 
-        public PreguntaServices(IPreguntaRepositorio questionRepositorio, IOpcionRepositorio opcionRepositorio, IMapper mapper, IMateriaRepositorio subjectRepositorio)
+        public PreguntaServices(
+            IPreguntaRepositorio questionRepositorio, 
+            IOpcionRepositorio opcionRepositorio, 
+            IMapper mapper, IMateriaRepositorio subjectRepositorio, IRespuestaUsuarioRepositorio respuestaUsuarioRepositorio)
         {
             _questionRepositorio = questionRepositorio;
             _mapper = mapper;
             _subjectRepositorio = subjectRepositorio;
             _opcionRepositorio = opcionRepositorio;
+            _respuestaUsuarioRepositorio = respuestaUsuarioRepositorio;
         }
 
         public async Task<QuestionDataResponse> BusquedaPaginado()
@@ -143,11 +148,57 @@ namespace Application.Questions.Services
             return _mapper.Map<IReadOnlyList<PreguntaDto>>(response);
         }
 
+        public async Task<IReadOnlyList<PreguntaDto>> FindAllQuestionMateria(PreguntaView view)
+        {
+            var response = await _questionRepositorio.FindAllQuestionMateria(view);
+
+            return _mapper.Map<IReadOnlyList<PreguntaDto>>(response);
+        }
+
         public async Task<PreguntaDto> FindByIdAsync(int id)
         {
             var response = await _questionRepositorio.FindByIdAsync(id);
 
             return _mapper.Map<PreguntaDto>(response);
         }
+
+        public async Task<OperationResult<RespuestaUsuarioDto>> SaveRespuesta(RespuestaUsuarioSaveDto saveDto)
+        {
+            var respuesta = _mapper.Map<RespuestaUsuario>(saveDto);
+            
+            var valid = await _respuestaUsuarioRepositorio.FindByIdUsuarioAsync(saveDto.IdUsuario, saveDto.IdPregunta);
+
+            if(valid != null)
+            {
+                return new OperationResult<RespuestaUsuarioDto>()
+                {
+                    State = true,
+                    Data = _mapper.Map<RespuestaUsuarioDto>(respuesta),
+                    Message = "Respuesta ya esta  registrada con exito"
+                };
+            }
+
+
+            respuesta.FechaRespuesta = DateTime.Now;
+
+            await _respuestaUsuarioRepositorio.SaveAsync(respuesta);
+
+            return new OperationResult<RespuestaUsuarioDto>()
+            {
+                State = true,
+                Data = _mapper.Map<RespuestaUsuarioDto>(respuesta),
+                Message = "Respuesta creada con exito"
+            };
+        }
+
+        public async Task<IReadOnlyList<RespuestaUsuarioDto>> FinPreguntaAsync(int id)
+        {
+            var response = await _respuestaUsuarioRepositorio.FindAllAsyncMateria(id);
+
+            return _mapper.Map<IReadOnlyList<RespuestaUsuarioDto>>(response);
+        }
+
+
+
     }
 }

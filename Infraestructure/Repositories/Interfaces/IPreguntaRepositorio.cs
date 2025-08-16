@@ -8,5 +8,6 @@ namespace Infraestructure.Repositories.Interfaces
     {
         Task<QuestionDataResponse> BusquedaPaginado();
         Task<IReadOnlyList<Pregunta>> FindAllMateriaAsync(int id);
+        Task<IReadOnlyList<Pregunta>> FindAllQuestionMateria(PreguntaView view);
     }
 }

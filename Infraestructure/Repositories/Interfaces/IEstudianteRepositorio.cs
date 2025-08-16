@@ -12,5 +12,6 @@ namespace Infraestructure.Repositories.Interfaces
     public interface IEstudianteRepositorio : ICurdCoreRespository<Estudiante, int> 
     {
         Task<StudentsMeta<Estudiante>> BusquedaPaginado();
+        Task<Estudiante?> FindByIdUsuarioAsync(int id);
     }
 }

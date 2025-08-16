@@ -15,7 +15,7 @@ namespace Application.Materias.Services.Interfaces
         Task<OperationResult<CursoDto>> SaveCursoLeccion(int id, CursoLeccionSaveDto saveDto);
         Task<IReadOnlyList<CursoDto>> FecthByIdMateria(int idMateria);
         Task<IReadOnlyList<LeccionDto>> FecthByIdCurso(int idCurso);
-
+        Task<IReadOnlyList<CursoDto>> FindAllQuestionMateria(int idMateria);
         Task<CursoDto> FecthByIdCu(int idCurso);
 
 

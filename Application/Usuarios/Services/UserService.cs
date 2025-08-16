@@ -164,7 +164,7 @@ namespace Application.Usuarios.Services
             
             var user_securiti = _securityService.JwtSecurity(jwtSecretKey);
 
-            var infoestudiante = await _estudianteRepositorio.FindByIdAsync(user.IdUsuario);
+            var infoestudiante = await _estudianteRepositorio.FindByIdUsuarioAsync(user.IdUsuario);
 
             var rol_user = await _rolUsuarioRepositorio.FindByIdAsync(user.IdUsuario);
 
@@ -173,9 +173,9 @@ namespace Application.Usuarios.Services
                 Id = user.IdUsuario,
                 Name = user.NombreCompleto,
                 Email = user.Correo,
-                Type = rol_user.Rol.Descripcion,
-                Grade = infoestudiante.IdGrado,
-                Rol = rol_user.Rol.Descripcion
+                Type = rol_user?.Rol.Descripcion,
+                Grade = infoestudiante?.IdGrado ?? 0,
+                Rol = rol_user?.Rol.Descripcion
             };
             
             byte[] randomBytes = RandomNumberGenerator.GetBytes(64);
