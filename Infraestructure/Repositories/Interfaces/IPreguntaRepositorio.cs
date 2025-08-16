@@ -9,5 +9,10 @@ namespace Infraestructure.Repositories.Interfaces
         Task<QuestionDataResponse> BusquedaPaginado();
         Task<IReadOnlyList<Pregunta>> FindAllMateriaAsync(int id);
         Task<IReadOnlyList<Pregunta>> FindAllQuestionMateria(PreguntaView view);
+        // -- 1. Aprendizaje Adaptativo
+        Task<Pregunta?> FindEasiestQuestionAsync(int idCurso);
+        Task<Pregunta?> FindNextDifficultyAsync(int idLeccion, string dificultadActual);
+        Task<Pregunta?> FindPreviousDifficultyAsync(int idLeccion, string dificultadActual);
+        Task<Pregunta?> FindNextLessonEasiestQuestionAsync(int idCurso, int idLeccionActual);
     }
 }

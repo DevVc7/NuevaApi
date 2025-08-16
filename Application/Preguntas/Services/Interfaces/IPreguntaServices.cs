@@ -10,9 +10,11 @@ namespace Application.Preguntas.Services.Interfaces
         Task<QuestionDataResponse> BusquedaPaginado();
         Task<IReadOnlyList<PreguntaDto>> FindAllMateriaAsync(int id);
         Task<IReadOnlyList<PreguntaDto>> FindAllQuestionMateria(PreguntaView view);
-
         Task<OperationResult<RespuestaUsuarioDto>> SaveRespuesta(RespuestaUsuarioSaveDto saveDto);
         Task<IReadOnlyList<RespuestaUsuarioDto>> FinPreguntaAsync(int id);
-
+        
+        // -- Funciones para el sistema de aprendizaje adaptativo --
+        Task<PreguntaDto> GetFirstAdaptiveQuestionAsync(int idUsuario, int idCurso);
+        Task<PreguntaDto> GetNextAdaptiveQuestionAsync(int idUsuario, int idPreguntaRespondida);
     }
 }

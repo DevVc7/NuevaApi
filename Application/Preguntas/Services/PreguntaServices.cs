@@ -1,10 +1,12 @@
-﻿using Application.Exceptions;
+using Application.Exceptions;
 using Application.Preguntas.Dto;
 using Application.Preguntas.Services.Interfaces;
 using AutoMapper;
 using Domain;
 using Domain.View;
+using Infraestructure.Repositories;
 using Infraestructure.Repositories.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Numerics;
 
@@ -198,7 +200,64 @@ namespace Application.Questions.Services
             return _mapper.Map<IReadOnlyList<RespuestaUsuarioDto>>(response);
         }
 
+        // -- 1. Lógica para el "Cold Start" (la primera pregunta) --
+        public async Task<PreguntaDto> GetFirstAdaptiveQuestionAsync(int idUsuario, int idCurso)
+        {
+            var hasHistory = await _respuestaUsuarioRepositorio.HasHistoryAsync(idUsuario, idCurso);
 
+            if (hasHistory)
+            {
+                var lastAnswer = await _respuestaUsuarioRepositorio.FindLastAnswerAsync(idUsuario, idCurso);
 
+                return await GetNextAdaptiveQuestionAsync(idUsuario, lastAnswer.IdPregunta);
+            }
+            else
+            {
+                var firstQuestion = await _questionRepositorio.FindEasiestQuestionAsync(idCurso);
+
+                return _mapper.Map<PreguntaDto>(firstQuestion);
+            }
+        }
+
+        // -----------------------------------------------------------------
+        // 2. El Corazón de la Lógica Adaptativa
+        // -----------------------------------------------------------------
+        public async Task<PreguntaDto> GetNextAdaptiveQuestionAsync(int idUsuario, int idPreguntaRespondida)
+        {
+            // Paso 1: Obtener los metadatos de la pregunta que acaba de ser respondida.
+            var lastQuestion = await _questionRepositorio.FindByIdAsync(idPreguntaRespondida);
+
+            if (lastQuestion == null) return null;
+
+            // Paso 2: Obtener el resultado de la última respuesta del usuario.
+            var lastAnswer = await _respuestaUsuarioRepositorio.FindLastAnswerForQuestionAsync(idUsuario, idPreguntaRespondida);
+
+            // Paso 3: Validar que la pregunta tiene la información necesaria para la lógica adaptativa.
+            if (!lastQuestion.IdLeccion.HasValue || string.IsNullOrEmpty(lastQuestion.Dificultad) || !lastQuestion.idCurso.HasValue)
+            {
+                return null; 
+            }
+
+            if (lastAnswer.PuntajeObtenido > 0) 
+            {
+                var nextQuestion = await _questionRepositorio.FindNextDifficultyAsync(lastQuestion.IdLeccion.Value, lastQuestion.Dificultad);
+
+                if (nextQuestion != null)
+                {
+                    return _mapper.Map<PreguntaDto>(nextQuestion);
+                }
+                else
+                {
+                    var nextLessonQuestion = await _questionRepositorio.FindNextLessonEasiestQuestionAsync(lastQuestion.idCurso.Value, lastQuestion.IdLeccion.Value);
+                    return _mapper.Map<PreguntaDto>(nextLessonQuestion);
+                }
+            }
+            else
+            {
+                var nextQuestion = await _questionRepositorio.FindPreviousDifficultyAsync(lastQuestion.IdLeccion.Value, lastQuestion.Dificultad);
+
+                return _mapper.Map<PreguntaDto>(nextQuestion);
+            }
+        }
     }
 }

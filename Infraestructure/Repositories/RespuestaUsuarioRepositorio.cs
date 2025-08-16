@@ -40,5 +40,29 @@ namespace Infraestructure.Repositories
 
             return response;
         }
+
+        public async Task<bool> HasHistoryAsync(int idUsuario, int idCurso)
+        {
+            return await _dbContext.Set<RespuestaUsuario>()
+                .Include(r => r.IdPregunta)
+                .AnyAsync(r => r.IdUsuario == idUsuario && r.Pregunta.idCurso == idCurso);
+        }
+
+        public async Task<RespuestaUsuario?> FindLastAnswerAsync(int idUsuario, int idCurso)
+        {
+            return await _dbContext.Set<RespuestaUsuario>()
+                .Include(r => r.Pregunta)
+                .Where(r => r.IdUsuario == idUsuario && r.Pregunta.idCurso == idCurso)
+                .OrderByDescending(r => r.FechaRespuesta)
+                .FirstOrDefaultAsync();
+        }
+
+        public async Task<RespuestaUsuario?> FindLastAnswerForQuestionAsync(int idUsuario, int idPregunta)
+        {
+            return await _dbContext.Set<RespuestaUsuario>()
+                .Where(r => r.IdUsuario == idUsuario && r.IdPregunta == idPregunta)
+                .OrderByDescending(r => r.FechaRespuesta)
+                .FirstOrDefaultAsync();
+        }
     }
 }

@@ -89,7 +89,7 @@ namespace Infraestructure.Repositories
                 .Include(q => q.Grado)
                 .Include(q => q.Materia)
                 .Include(q => q.OpcionesRpt)
-                .Where(t => t.IdMateria == view.IdMateria && t.idCurso == view.IdCurso && t.IdGrado == view.IdGrado).ToListAsync();
+                .Where(t => t.IdMateria == view.IdMateria && t.idCurso == view.IdCurso && t.IdGrado == view.IdGrado && t.Estado).ToListAsync();
 
             return response;
         }
@@ -145,8 +145,51 @@ namespace Infraestructure.Repositories
                 .ToList();
         }
 
+        public async Task<Pregunta?> FindEasiestQuestionAsync(int idCurso)
+        {
+            // Encuentra la pregunta con la dificultad "Facil" en la primera lección del curso.
+            return await _context.Set<Pregunta>()
+                .Where(q => q.idCurso == idCurso && q.Dificultad == "Facil")
+                .OrderBy(q => q.IdLeccion)
+                .FirstOrDefaultAsync();
+        }
 
+        public async Task<Pregunta?> FindNextDifficultyAsync(int idLeccion, string dificultadActual)
+        {
+            // Lógica para ordenar las dificultades (esto puede variar, aquí se usa un orden fijo).
+            var ordenDificultad = new Dictionary<string, int>
+            {
+                { "Facil", 1 }, { "Medio", 2 }, { "Dificil", 3 }
+            };
 
+            var dificultadSiguiente = ordenDificultad.FirstOrDefault(d => d.Value == ordenDificultad[dificultadActual] + 1).Key;
 
+            return await _context.Set<Pregunta>()
+                .Where(q => q.IdLeccion == idLeccion && q.Dificultad == dificultadSiguiente)
+                .FirstOrDefaultAsync();
+        }
+
+        public async Task<Pregunta?> FindPreviousDifficultyAsync(int idLeccion, string dificultadActual)
+        {
+            var ordenDificultad = new Dictionary<string, int>
+            {
+                { "Facil", 1 }, { "Medio", 2 }, { "Dificil", 3 }
+            };
+
+            var dificultadAnterior = ordenDificultad.FirstOrDefault(d => d.Value == ordenDificultad[dificultadActual] - 1).Key;
+
+            return await _context.Set<Pregunta>()
+                .Where(q => q.IdLeccion == idLeccion && q.Dificultad == dificultadAnterior)
+                .FirstOrDefaultAsync();
+        }
+
+        public async Task<Pregunta?> FindNextLessonEasiestQuestionAsync(int idCurso, int idLeccionActual)
+        {
+            return await _context.Set<Pregunta>()
+                .Where(q => q.idCurso == idCurso && q.IdLeccion > idLeccionActual)
+                .OrderBy(q => q.IdLeccion)
+                .ThenBy(q => q.Dificultad)
+                .FirstOrDefaultAsync();
+        }
     }
 }

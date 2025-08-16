@@ -139,5 +139,40 @@ namespace DinsidesBack.Controllers
 
             return TypedResults.BadRequest();
         }
+
+        // --- ENDPOINTS ADAPTATIVOS ---
+
+        [HttpGet("iniciar-sesion-adaptativa")]
+        public async Task<Results<BadRequest, Ok<PreguntaDto>>> IniciarSesionAdaptativa(int idUsuario, int idCurso)
+        {
+            // servicio para manejar el 'cold start' y obtener la primera pregunta.
+            // La lógica es: si el usuario no tiene historial en este curso, le devuelve la primera pregunta
+            // Si ya tiene historial, le devuelve la siguiente pregunta según su último avance.
+            var nextQuestion = await _questionServices.GetFirstAdaptiveQuestionAsync(idUsuario, idCurso);
+
+            if (nextQuestion != null) return TypedResults.Ok(nextQuestion);
+
+            return TypedResults.BadRequest();
+        }
+
+        [HttpPost("siguiente-pregunta-adaptativa")]
+        public async Task<Results<BadRequest, Ok<PreguntaDto>>> PostRespuesta([FromBody] RespuestaUsuarioSaveDto respuesta)
+        {
+            // 1. Guardar la respuesta del usuario en la base de datos.
+            var saveResult = await _questionServices.SaveRespuesta(respuesta);
+
+            if (saveResult == null) return TypedResults.BadRequest();
+
+            // 2. Usar el ID del usuario y de la pregunta para que el algoritmo decida cuál es la siguiente pregunta óptima.
+            var nextQuestion = await _questionServices.GetNextAdaptiveQuestionAsync(respuesta.IdUsuario, respuesta.IdPregunta);
+
+            // 3. Devolver la pregunta adaptativa. Si es nula, significa que el alumno ha terminado el curso o no hay más preguntas disponibles.
+            if (nextQuestion != null)
+            {
+                return TypedResults.Ok(nextQuestion);
+            }
+
+            return TypedResults.BadRequest();
+        }
     }
 }
