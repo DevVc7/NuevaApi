@@ -21,7 +21,7 @@ namespace Application.Usuarios.Dto
         public string? Name { get; set; }
         public string? Email { get; set; }
         public string? Type { get; set; }
-        public string? Grade { get; set; }
+        public int? Grade { get; set; }
         public string? Rol { get; set; }
 
     }

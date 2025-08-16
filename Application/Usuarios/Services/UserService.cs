@@ -20,6 +20,7 @@ namespace Application.Usuarios.Services
         private readonly IUsuarioRepositorio _usuarioRepositorio;
         private readonly IRolRepositorio _rolRepositorio;
         private readonly IRolUsuarioRepositorio _rolUsuarioRepositorio;
+        private readonly IEstudianteRepositorio _estudianteRepositorio;
         private readonly IEscuelaRepositorio _escuelaRepositorio;
         private readonly IJwtServices _securityService;
         private readonly IConfiguration _configuration;
@@ -29,6 +30,7 @@ namespace Application.Usuarios.Services
             IEscuelaRepositorio escuelaRepositorio,
             IRolUsuarioRepositorio rolUsuarioRepositorio , 
             IRolRepositorio rolRepositorio ,
+            IEstudianteRepositorio estudianteRepositorio,
             IUsuarioRepositorio usuarioRepositorio, 
             IJwtServices securityService, 
             IConfiguration configuration, 
@@ -42,6 +44,7 @@ namespace Application.Usuarios.Services
             _securityService = securityService;
             _configuration = configuration;
             _logger = logger;
+            _estudianteRepositorio = estudianteRepositorio;
         }
 
         public async Task<OperationResult<UserDto>> CreateAsync(UserRolSaveDto saveDto)
@@ -161,6 +164,8 @@ namespace Application.Usuarios.Services
             
             var user_securiti = _securityService.JwtSecurity(jwtSecretKey);
 
+            var infoestudiante = await _estudianteRepositorio.FindByIdAsync(user.IdUsuario);
+
             var rol_user = await _rolUsuarioRepositorio.FindByIdAsync(user.IdUsuario);
 
             var view_user = new UserView()
@@ -169,7 +174,7 @@ namespace Application.Usuarios.Services
                 Name = user.NombreCompleto,
                 Email = user.Correo,
                 Type = rol_user.Rol.Descripcion,
-                Grade = "",
+                Grade = infoestudiante.IdGrado,
                 Rol = rol_user.Rol.Descripcion
             };
             
