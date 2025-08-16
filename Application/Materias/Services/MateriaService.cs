@@ -252,5 +252,47 @@ namespace Application.Materias.Services
 
             return _mapper.Map<IReadOnlyList<CursoDto>>(cursos);
         }
+
+        public async Task<OperationResult<CursoDto>> DisabledAsyncCurso(int idCurso)
+        {
+
+            var curso = await _cursoRepositorio.FindByIdAsync(idCurso);
+
+            if (curso == null) return new OperationResult<CursoDto>() { Data = _mapper.Map<CursoDto>(curso), Message = "Curso no esta esta Inscrito", State = false };
+
+            curso.Estado = !curso.Estado;
+            curso.DeletedAt = DateTime.Now;
+
+            await _cursoRepositorio.SaveAsync(curso);
+
+            return new OperationResult<CursoDto>()
+            {
+                State = true,
+                Data = _mapper.Map<CursoDto>(curso),
+                Message = "Materia eliminado con exito"
+            };
+        }
+
+
+        public async Task<OperationResult<LeccionDto>> DisabledAsyncLeccion(int idLeccion)
+        {
+
+            var leccion = await _leccionRepositorio.FindByIdAsync(idLeccion);
+
+            if (leccion == null) return new OperationResult<LeccionDto>() { Data = _mapper.Map<LeccionDto>(leccion), Message = "Leccion no esta esta Inscrito", State = false };
+
+            leccion.Estado = !leccion.Estado;
+            leccion.DeletedAt = DateTime.Now;
+
+            await _leccionRepositorio.SaveAsync(leccion);
+
+            return new OperationResult<LeccionDto>()
+            {
+                State = true,
+                Data = _mapper.Map<LeccionDto>(leccion),
+                Message = "Materia eliminado con exito"
+            };
+        }
+
     }
 }

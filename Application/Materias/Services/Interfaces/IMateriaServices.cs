@@ -18,6 +18,9 @@ namespace Application.Materias.Services.Interfaces
         Task<IReadOnlyList<CursoDto>> FindAllQuestionMateria(int idMateria);
         Task<CursoDto> FecthByIdCu(int idCurso);
 
+        Task<OperationResult<LeccionDto>> DisabledAsyncLeccion(int idCurso);
+        Task<OperationResult<CursoDto>> DisabledAsyncCurso(int idLeccion);
+
 
 
 
