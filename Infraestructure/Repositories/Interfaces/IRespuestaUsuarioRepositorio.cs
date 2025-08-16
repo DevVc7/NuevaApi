@@ -12,6 +12,9 @@ namespace Infraestructure.Repositories.Interfaces
     {
         Task<RespuestaUsuario?> FindByIdUsuarioAsync(int idUsuario, int idPregunta);
         Task<IReadOnlyList<RespuestaUsuario>> FindAllAsyncMateria(int id);
-
+        // -- 1. Aprendizaje Adaptativo
+        Task<bool> HasHistoryAsync(int idUsuario, int idCurso);
+        Task<RespuestaUsuario?> FindLastAnswerAsync(int idUsuario, int idCurso);
+        Task<RespuestaUsuario?> FindLastAnswerForQuestionAsync(int idUsuario, int idPregunta);
     }
 }
