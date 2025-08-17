@@ -68,6 +68,18 @@ namespace DinsidesBack.Controllers
             return TypedResults.BadRequest();
         }
 
+        [HttpDelete("{id}")]
+        [AllowAnonymous]
+        public async Task<Results<BadRequest, Ok<OperationResult<MateriaDto>>>> Delete(int id)
+        {
+
+            var response = await _materiaServices.DisabledAsync(id);
+
+            if (response != null) return TypedResults.Ok(response);
+
+            return TypedResults.BadRequest();
+        }
+
         [HttpDelete("curso/{id}")]
         [AllowAnonymous]
         public async Task<Results<BadRequest, Ok<OperationResult<CursoDto>>>> DeleteCurso(int id)

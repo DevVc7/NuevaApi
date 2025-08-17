@@ -17,5 +17,6 @@ namespace Application.Preguntas.Services.Interfaces
         Task<PreguntaDto> GetFirstAdaptiveQuestionAsync(int idUsuario, int idCurso);
         Task<PreguntaDto?> GetNextAdaptiveQuestionAsync(int idUsuario, int idPreguntaAnterior);
         Task<bool> ResetAdaptiveTestAsync(int idUsuario, int idCurso);
+        Task<IReadOnlyList<ProgresoStudentRespuesta>> ProgresoStudentRespuesta();
     }
 }

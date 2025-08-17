@@ -8,6 +8,7 @@ using Infraestructure.Repositories;
 using Infraestructure.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
 using System.Numerics;
 
 namespace Application.Questions.Services
@@ -232,5 +233,45 @@ namespace Application.Questions.Services
             var rowsAffected = await _respuestaUsuarioRepositorio.DeleteByUserIdAndCourseIdAsync(idUsuario, idCurso);
             return rowsAffected > 0;
         }
+
+
+
+        public async Task<IReadOnlyList<ProgresoStudentRespuesta>> ProgresoStudentRespuesta()
+        {
+            var respuestas = await _respuestaUsuarioRepositorio.FindAllAsync();
+            var preguntas = await _questionRepositorio.FindAllAsync();
+
+            // total de preguntas
+            int totalPreguntas = preguntas.Count;
+            int totalMate = preguntas.Count(p => p.IdMateria == 1);
+            int totalComu = preguntas.Count(p => p.IdMateria == 2);
+
+            // agrupamos por usuario
+            var progresoPorUsuario = respuestas
+                .GroupBy(r => r.IdUsuario)
+                .Select(g =>
+                {
+                    var respondidas = g.Select(r => r.IdPregunta).Distinct().ToList();
+
+                    int respondidasTotal = respondidas.Count;
+                    int respondidasMate = respondidas.Count(id =>
+                        preguntas.FirstOrDefault(p => p.IdPregunta == id)?.IdMateria == 1);
+                    int respondidasComu = respondidas.Count(id =>
+                        preguntas.FirstOrDefault(p => p.IdPregunta == id)?.IdMateria == 2);
+
+                    return new ProgresoStudentRespuesta
+                    {
+                        IdUsuario = g.Key,
+                        ProgresoTotal = totalPreguntas == 0 ? 0 : (int)Math.Round((decimal)respondidasTotal / totalPreguntas * 100),
+                        ProgresoMatematica = totalMate == 0 ? 0 : (int)Math.Round((decimal)respondidasMate / totalMate * 100),
+                        ProgresoComunicacion = totalComu == 0 ? 0 : (int)Math.Round((decimal)respondidasComu / totalComu * 100)
+                    };
+                })
+                .ToList();
+
+            return progresoPorUsuario;
+        }
+
+
     }
 }

@@ -188,5 +188,17 @@ namespace DinsidesBack.Controllers
 
             return TypedResults.BadRequest("No se pudo reiniciar el progreso. Es posible que el usuario no tuviera respuestas en este curso.");
         }
+
+
+        [HttpGet("progresso")]
+        [AllowAnonymous]
+        public async Task<Results<BadRequest, Ok<IReadOnlyList<ProgresoStudentRespuesta>>>> ProgresoStudentRespuesta()
+        {
+            var response = await _questionServices.ProgresoStudentRespuesta();
+
+            if (response != null) return TypedResults.Ok(response);
+
+            return TypedResults.BadRequest();
+        }
     }
 }
