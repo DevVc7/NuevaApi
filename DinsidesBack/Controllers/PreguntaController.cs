@@ -200,5 +200,28 @@ namespace DinsidesBack.Controllers
 
             return TypedResults.BadRequest();
         }
+
+        [HttpGet("reporte")]
+        [AllowAnonymous]
+        public async Task<Results<BadRequest, Ok<List<ReporteUsuarioDto>>>> GetReporteAsync()
+        {
+            var response = await _questionServices.GetReporteAsync();
+
+            if (response != null) return TypedResults.Ok(response);
+
+            return TypedResults.BadRequest();
+
+        }
+        [HttpGet("report/{idUsuario}")]
+        [AllowAnonymous]
+        public async Task<Results<BadRequest, Ok<List<ReporteUsuario>>>> GetReporteByUserAsync(int idUsuario)
+        {
+            var response = await _questionServices.GetReporteByUserAsync(idUsuario);
+
+            if (response != null) return TypedResults.Ok(response);
+
+            return TypedResults.BadRequest();
+
+        }
     }
 }

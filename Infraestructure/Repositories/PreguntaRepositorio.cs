@@ -210,5 +210,23 @@ namespace Infraestructure.Repositories
                 .Include(p => p.OpcionesRpt)
                 .FirstOrDefaultAsync(p => p.IdPregunta == id);
         }
+
+        public async Task<List<ReporteUsuarioDto>> GetReporteAsync()
+        {
+            var result = await _context.Set<ReporteUsuarioDto>()
+                .FromSqlRaw("EXEC GET_REPORTE")
+                .ToListAsync();
+
+            return result;
+        }
+
+        public async Task<List<ReporteUsuario>> GetReporteByUserAsync(int idUsuario)
+        {
+            var result = await _context.Set<ReporteUsuario>()
+                        .FromSqlRaw("EXEC GET_REPORTXUSER @IDUSUARIO = {0}", idUsuario)
+                        .ToListAsync();
+
+            return result;
+        }
     }
 }

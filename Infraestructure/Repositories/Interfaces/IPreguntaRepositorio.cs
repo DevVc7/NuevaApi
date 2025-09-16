@@ -16,5 +16,10 @@ namespace Infraestructure.Repositories.Interfaces
         Task<Pregunta?> FindNextLessonEasiestQuestionAsync(int idCurso, int idLeccionActual);
         Task<IReadOnlyList<Pregunta>> FindAllByCourseAsync(int idCurso);
         Task<Pregunta?> FindAdaptiveQuestionByIdAsync(int id);
+
+        // reporte
+
+        Task<List<ReporteUsuarioDto>> GetReporteAsync();
+        Task<List<ReporteUsuario>> GetReporteByUserAsync(int idUsuario);
     }
 }

@@ -186,6 +186,7 @@ namespace Application.Questions.Services
             };
         }
 
+
         public async Task<IReadOnlyList<RespuestaUsuarioDto>> FinPreguntaAsync(int id)
         {
             var response = await _respuestaUsuarioRepositorio.FindAllAsyncMateria(id);
@@ -272,6 +273,13 @@ namespace Application.Questions.Services
             return progresoPorUsuario;
         }
 
-
+        public async Task<List<ReporteUsuarioDto>> GetReporteAsync()
+        {
+            return await _questionRepositorio.GetReporteAsync();
+        }
+        public async Task<List<ReporteUsuario>> GetReporteByUserAsync(int idUsuario)
+        {
+            return await _questionRepositorio.GetReporteByUserAsync(idUsuario);
+        }
     }
 }
